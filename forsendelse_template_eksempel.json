@@ -1,0 +1,25 @@
+{
+  "batch_id": "orienteringsbrev-2026-10-20",
+  "sharepoint_folder_name": "20-10-2026",
+  "excel": {
+    "file_name": "CPR-numre.xlsx",
+    "sheet_name": null,
+    "cpr_column": "A",
+    "first_data_row": 2
+  },
+  "document": {
+    "mode": "PDF",
+    "file_name": "Fællesbrev.pdf",
+    "output_file_name": "Fællesbrev.pdf"
+  },
+  "subject": "Orienteringsbrev fra Haderslev Kommune",
+  "word": {
+    "bookmark_values": {},
+    "fill_name_and_address_bookmarks": false
+  },
+  "attachments": {
+    "Vejledning.pdf": "Vejledning version 3.pdf"
+  },
+  "delivery_method": "ONLY_DIGITAL_POST",
+  "dry_run": true
+}

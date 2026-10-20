@@ -1,0 +1,23 @@
+{
+  "batch_id": "",
+  "sharepoint_folder_name": "",
+  "excel": {
+    "file_name": "",
+    "sheet_name": null,
+    "cpr_column": "",
+    "first_data_row": null
+  },
+  "document": {
+    "mode": "",
+    "file_name": "",
+    "output_file_name": ""
+  },
+  "subject": "",
+  "word": {
+    "bookmark_values": {},
+    "fill_name_and_address_bookmarks": null
+  },
+  "attachments": {},
+  "delivery_method": "",
+  "dry_run": true
+}

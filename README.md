@@ -1,69 +1,49 @@
 # masseforsendelse-af-digitalpost
 
-Automation Server-proces, som genererer ét brev pr. work item og afleverer PDF'en til den centrale Digital Post-kø.
+Hver udsendelse styres af sin egen JSON-fil. `queue_feeder.py` indeholder ingen konkret udsendelsesopsætning.
 
-## Procesflow
+## Ny udsendelse
 
-1. `queue_feeder.py` læser CPR-numre fra `tests_local/cpr.xlsx` og opretter ét source-item pr. CPR.
-2. Worker-processen henter navn og adresse fra Datafordeleren, når funktionen er aktiveret.
-3. Den fælles DOCX-skabelon hentes fra SharePoint.
-4. `q-word` udfylder `[[PLADSHOLDERE]]`.
-5. `q-gotenberg` konverterer DOCX-bytes til PDF-bytes.
-6. `q-digitalpost` uploader PDF'en og opretter et item i den centrale Digital Post-kø.
-7. Source-itemet completes, når resultatet er `QUEUED` eller `NOT_SENT`.
+1. Kopiér `forsendelse_template.json`.
+2. Læg kopien i `forsendelser/`.
+3. Omdøb kopien, fx `orienteringsbrev-2026-10-20.json`.
+4. Udfyld alle værdier.
+5. Behold først `"dry_run": true`.
+6. Kør `uv run python queue_feeder.py`.
+7. Skriv JSON-filens navn i terminalen.
+8. Kontrollér udskriften.
+9. Skift til `"dry_run": false` og kør samme JSON igen.
 
-## Første opsætning
+Mappen `forsendelser/` er i `.gitignore`. Den blanke `forsendelse_template.json` ligger i repositoryets rod og commits som den fælles skabelon.
 
-1. Opret køen `masseforsendelse-af-digitalpost` i Automation Server.
-2. Sæt køens tekniske ID i `configuration.py` som `WORKQUEUE_ID`.
-3. Upload Word-skabelonen til SharePoint.
-4. Sæt `TEMPLATE_SITE_NAME`, `TEMPLATE_LIBRARY_NAME` og `TEMPLATE_DRIVE_ITEM_ID` i `configuration.py`.
-5. Kør `uv lock` og `uv sync`.
-6. Kontrollér `.env`.
+Den fulde feltforklaring står øverst i `queue_feeder.py`.
 
-## Word-skabelon
+## JSON-eksempel
 
-`q-word` bruger pladsholdere med dobbelte kantede parenteser, eksempelvis:
-
-- `[[NAVN]]`
-- `[[ADRESSE]]`
-- `[[POSTNUMMER_OG_BY]]`
-- `[[DATO]]`
-
-Når `FILL_NAME_AND_ADDRESS_BOOKMARKS = True`, udfyldes de tre første automatisk via Datafordeleren. Øvrige pladsholdere angives i `BOOKMARK_VALUES` øverst i `queue_feeder.py`.
-
-## Manuel feeder
-
-Læg Excel-filen i:
-
-`tests_local/cpr.xlsx`
-
-Standard er CPR i kolonne A fra række 2. Ret derefter den manuelle konfiguration øverst i `queue_feeder.py`, blandt andet:
-
-- `BATCH_ID`
-- `SUBJECT`
-- `BOOKMARK_VALUES`
-- `FILL_NAME_AND_ADDRESS_BOOKMARKS`
-- `DELIVERY_METHOD`
-
-Kør først med `DRY_RUN = True`:
-
-`uv run python queue_feeder.py`
-
-Når optællingen er kontrolleret, ret til `DRY_RUN = False` og kør igen.
-
-## Worker
-
-Kør processen:
-
-`uv run python main.py`
-
-## Dubletbeskyttelse
-
-Referencen består af:
-
-`<BATCH_ID>:<løbenummer>:<CPR>`
-
-Inden et brev oprettes igen, søger worker-processen efter `source_item_id` i den centrale Digital Post-kø. Hvis itemet allerede findes, bliver source-itemet completed uden at oprette en ny bestilling.
-
-Vælg altid et nyt og meningsfuldt `BATCH_ID` for hver udsendelse.
+```json
+{
+  "batch_id": "orienteringsbrev-2026-10-20",
+  "sharepoint_folder_name": "20-10-2026",
+  "excel": {
+    "file_name": "modtagere.xlsx",
+    "sheet_name": null,
+    "cpr_column": "A",
+    "first_data_row": 2
+  },
+  "document": {
+    "mode": "PDF",
+    "file_name": "Fællesbrev.pdf",
+    "output_file_name": "Fællesbrev.pdf"
+  },
+  "subject": "Orienteringsbrev fra Haderslev Kommune",
+  "word": {
+    "bookmark_values": {},
+    "fill_name_and_address_bookmarks": false
+  },
+  "attachments": {
+    "Vejledning.pdf": "Vejledning version 3.pdf"
+  },
+  "delivery_method": "ONLY_DIGITAL_POST",
+  "dry_run": true
+}
+```

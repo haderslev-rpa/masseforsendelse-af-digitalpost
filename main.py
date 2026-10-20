@@ -1,7 +1,8 @@
-"""Indgangspunkt for processen send-breve-via-digitalpost."""
+"""Indgangspunkt for processen masseforsendelse-af-digitalpost."""
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import logging
 import os
@@ -11,7 +12,7 @@ from automation_server_client import AutomationServer, Workqueue
 from dotenv import load_dotenv
 
 from behandel import PermanentItemError, behandel_item
-from configuration import MAX_ITEMS_PER_RUN, WORKQUEUE_ID
+from configuration import MAX_ITEMS_PER_RUN
 from models import ProcessingState
 
 load_dotenv()
@@ -27,19 +28,37 @@ logging.getLogger("automation_server_client").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
-def _select_items(workqueue: Workqueue):
-    items = workqueue
-    debug_reference = os.getenv("DEBUG_ITEM_REFERENCE", "").strip()
-    if debug_reference:
-        return [item for item in items if item.reference == debug_reference][:1]
+def _vaelg_items_til_behandling(
+    workqueue: Workqueue,
+    *,
+    debug: bool,
+):
+    """Vælg køens items eller ét bestemt item ved lokal debug."""
+    if debug:
+        debug_reference = os.getenv("DEBUG_ITEM_REFERENCE", "").strip()
+        if not debug_reference:
+            raise ValueError(
+                "DEBUG_ITEM_REFERENCE skal udfyldes i .env ved --debug."
+            )
+        return [
+            item
+            for item in workqueue
+            if item.reference == debug_reference
+        ][:1]
+
     if MAX_ITEMS_PER_RUN is None:
-        return items
-    return list(items)[:MAX_ITEMS_PER_RUN]
+        return workqueue
+    return list(workqueue)[:MAX_ITEMS_PER_RUN]
 
 
-async def process_workqueue(workqueue: Workqueue, debug: bool = False) -> int:
+async def process_workqueue(
+    workqueue: Workqueue,
+    *,
+    debug: bool,
+) -> int:
+    """Behandl work items ét ad gangen."""
     processed = 0
-    for item in _select_items(workqueue):
+    for item in _vaelg_items_til_behandling(workqueue, debug=debug):
         with item:
             processed += 1
             logger.info("Behandler brev-item reference=%s", item.reference)
@@ -53,7 +72,10 @@ async def process_workqueue(workqueue: Workqueue, debug: bool = False) -> int:
                 item.update(item.data)
                 item.fail(str(error))
             except Exception as error:
-                logger.exception("Teknisk fejl for reference=%s", item.reference)
+                logger.exception(
+                    "Teknisk fejl for reference=%s",
+                    item.reference,
+                )
                 box = item.data.setdefault("box", {})
                 box["last_error"] = f"{type(error).__name__}: {error}"
                 item.update(item.data)
@@ -61,12 +83,28 @@ async def process_workqueue(workqueue: Workqueue, debug: bool = False) -> int:
     return processed
 
 
+def _parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Behandl kun DEBUG_ITEM_REFERENCE ved lokal fejlsøgning.",
+    )
+    return parser.parse_args()
+
+
 async def main() -> None:
-    if WORKQUEUE_ID <= 0:
-        raise ValueError("WORKQUEUE_ID skal udfyldes i configuration.py.")
+    arguments = _parse_arguments()
     automation_server = AutomationServer.from_environment()
-    workqueue = automation_server.workqueue(WORKQUEUE_ID)
-    count = await process_workqueue(workqueue)
+
+    # Køen kommer fra Automation Server-processens miljø.
+    # Der bruges derfor ikke et hardkodet WORKQUEUE_ID.
+    workqueue = automation_server.workqueue()
+
+    count = await process_workqueue(
+        workqueue,
+        debug=arguments.debug,
+    )
     logger.info("Behandlede %s item(s).", count)
 
 

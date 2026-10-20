@@ -1,4 +1,4 @@
-"""Interne states til processen send-breve-via-digitalpost."""
+"""Interne processtates for masseforsendelse-af-digitalpost."""
 
 from enum import StrEnum
 

@@ -1,27 +1,29 @@
-"""Fast konfiguration til processen send-breve-via-digitalpost."""
+"""Fast teknisk konfiguration for masseforsendelse-af-digitalpost.
 
-# Det tekniske ID på processens egen Automation Server-kø.
-# Ret værdien efter køen er oprettet i Automation Server.
-WORKQUEUE_ID = 23
+Denne fil ændres normalt ikke fra udsendelse til udsendelse.
+Alt, som gælder det konkrete brev, Excel-ark og Word-skabelon,
+konfigureres i queue_feeder.py og gemmes i item.data["box"].
+"""
 
-# Det tekniske ID på den centrale Digital Post-kø.
+# Den centrale Digital Post-kø.
+# q-digitalpost bruger denne kø til den videre afsendelse.
 DIGITAL_POST_QUEUE_ID = 13
 
-# SharePoint-placering for den fælles Word-skabelon.
-TEMPLATE_SITE_NAME = "Automatisering"
-TEMPLATE_LIBRARY_NAME = "RPA - Processer/masseforsendelse-af-digitalpost"
+# SharePoint-site.
+SHAREPOINT_SITE_NAME = "Automatisering"
 
-# Indsæt SharePoints drive-item-id for DOCX-skabelonen.
-# Drive-item-id bruges, så alle items i et batch anvender samme filreference.
-TEMPLATE_DRIVE_ITEM_ID = ""
-TEMPLATE_FILE_NAME = "brevskabelon.docx"
+# Det rigtige dokumentbibliotek.
+SHAREPOINT_LIBRARY_NAME = "Dokumenter"
 
-# Worker-capability i Automation Server.
-WORKER_CAPABILITY = "masseforsendelse-af-digitalpost"
+# Mapperne under dokumentbiblioteket.
+SHAREPOINT_BASE_FOLDER = (
+    "RPA - Processer/"
+    "masseforsendelse-af-digitalpost"
+)
 
-# Procesnavnet gemmes i Digital Post-itemets source_process.
+# Procesnavnet gemmes som source_process i Digital Post-bestillingen.
 SOURCE_PROCESS = "masseforsendelse-af-digitalpost"
 
-# Maksimalt antal NEW-items, der behandles pr. proceskørsel.
-# None betyder alle items, som Automation Server leverer til workqueue-objektet.
+# None betyder, at alle items, som Automation Server leverer,
+# kan behandles i den aktuelle proceskørsel.
 MAX_ITEMS_PER_RUN = None
