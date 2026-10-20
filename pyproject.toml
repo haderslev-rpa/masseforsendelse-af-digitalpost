@@ -1,14 +1,26 @@
 [project]
-name = "process-template"
-version = "0.2.0"
-description = "Add your description here"
+name = "masseforsendelse-af-digitalpost"
+version = "0.1.0"
+description = "Genererer breve fra Word-skabelon og lægger dem i den centrale Digital Post-kø"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "automation-server-client",
+    "openpyxl>=3.1.5",
+    "python-dotenv",
+    "q-datafordeleren-api",
+    "q-digitalpost",
+    "q-gotenberg-api",
     "q-haderslev-vbo",
+    "q-sharepoint-api",
+    "q-word",
 ]
 
 [tool.uv.sources]
 automation-server-client = { git = "https://github.com/odense-rpa/automation-server-client.git", tag = "v0.3.0" }
+q-datafordeleren-api = { git = "https://github.com/haderslev-rpa/q-datafordeleren-api.git", branch = "main" }
+q-digitalpost = { git = "https://github.com/haderslev-rpa/q-digitalpost.git", branch = "main" }
+q-gotenberg-api = { git = "https://github.com/haderslev-rpa/q-gotenberg-api.git", branch = "main" }
 q-haderslev-vbo = { git = "https://github.com/haderslev-rpa/q-haderslev-vbo.git", branch = "main" }
+q-sharepoint-api = { git = "https://github.com/haderslev-rpa/q-sharepoint-api.git", branch = "main" }
+q-word = { git = "https://github.com/haderslev-rpa/q-word.git", branch = "main" }
