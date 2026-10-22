@@ -669,7 +669,7 @@ dependencies = [
 [[package]]
 name = "q-digitalpost"
 version = "0.1.0"
-source = { git = "https://github.com/haderslev-rpa/q-digitalpost.git?branch=main#f7b14936756440e16c412680128742a7520aaf41" }
+source = { git = "https://github.com/haderslev-rpa/q-digitalpost.git?branch=main#881dbb43958331328ddec1caae2a23ac0a44f0a4" }
 dependencies = [
     { name = "automation-server-client" },
     { name = "q-serviceplatformen" },
