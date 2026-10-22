@@ -669,7 +669,7 @@ dependencies = [
 [[package]]
 name = "q-digitalpost"
 version = "0.1.0"
-source = { git = "https://github.com/haderslev-rpa/q-digitalpost.git?branch=main#7c196f2ec519f08d1d38fd88186229b000023aef" }
+source = { git = "https://github.com/haderslev-rpa/q-digitalpost.git?branch=main#f7b14936756440e16c412680128742a7520aaf41" }
 dependencies = [
     { name = "automation-server-client" },
     { name = "q-serviceplatformen" },
@@ -699,7 +699,7 @@ dependencies = [
 [[package]]
 name = "q-serviceplatformen"
 version = "3.2.0"
-source = { git = "https://github.com/haderslev-rpa/q-serviceplatformen.git?branch=main#e9130c800d9a74f8e4708210acd6c144cf710066" }
+source = { git = "https://github.com/haderslev-rpa/q-serviceplatformen.git?branch=main#f4f250c2ebb21fa144800754685a4c27585da706" }
 dependencies = [
     { name = "automation-server-client" },
     { name = "cryptography" },
